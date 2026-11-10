@@ -233,13 +233,13 @@ async function registerAndVerify() {
   const challenge = crypto.getRandomValues(new Uint8Array(32));
   const rpId = location.hostname;
 
+      const userid = new Uint8Array([
+  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+  0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F]);
   const cred = await navigator.credentials.create({
     publicKey: {
       challenge,
       rp: { id: rpId, name: "Attestation test" },
-      const userid = new Uint8Array([
-  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-  0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F]);
       user: { id: userid, name: "Nitrokey Authenticity Test", displayName: "Nitrokey Authenticity Test" },
       pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }, { type: "public-key", alg: -8 }],
       attestation: "direct",
