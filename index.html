@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verify Genuine</title>
+<title>Verify Authenticity | Nitrokey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Teko:wght@500;700&display=swap" rel="stylesheet">
 <script src="./nk_search.js"></script>
 <script src="./webauthn_attestation.js"></script>
 <style>
@@ -12,7 +15,9 @@
     --ok: #1b8a3d;
     --fail: #c62828;
     --test: #d35400;
-    --text: #1a1a1a;
+    --text: #000000;
+    --brand: #c70336;       /* Nitrokey red */
+    --brand-dark: #ab1738;  /* Nitrokey red, hover */
   }
 
   * { box-sizing: border-box; }
@@ -25,13 +30,62 @@
     align-items: center;
     background: var(--bg);
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
     transition: color 0.3s ease;
   }
 
   body.active { color: #fff; }
 
-  header, main { position: relative; z-index: 1; }
+  .site-header, main { position: relative; z-index: 1; }
+
+  /* Header bar, styled after nitrokey.com: white, soft shadow, logo left, links right */
+  .site-header {
+    width: 100%;
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    padding: 0.75rem 1.5rem;
+    background: #fff;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .logo { display: block; line-height: 0; }
+  .logo img { display: block; height: 58px; width: auto; max-width: 100%; }
+
+  .site-header nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.25rem 1.25rem;
+  }
+
+  .site-header nav a {
+    display: block;
+    padding: 0.6em 0.45em;
+    color: #000;
+    font-size: 1.0667em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+  }
+
+  .site-header nav a:hover { color: var(--brand-dark); }
+
+  .site-header a:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .site-header { justify-content: center; }
+    .site-header nav { justify-content: center; }
+  }
 
   /* Colour layer: bursts outward from the button, collapses back on reset */
   #pop {
@@ -54,33 +108,26 @@
     100% { transform: scale(1);   opacity: 1; }
   }
 
-  /* Top 25% of the screen holds the logo */
-  header {
-    height: 25%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-  }
-
-  header img {
-    max-width: min(70%, 320px);
-    max-height: 100%;
-    background: #fff;
-    padding: 0.6rem 1rem;
-    border-radius: 12px;
-  }
-
   main {
     width: 100%;
-    max-width: 480px;
-    padding: 1.5rem;
+    max-width: 520px;
+    padding: 2.5rem 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
   }
+
+  /* Intro text above the button */
+  .intro { text-align: center; font-size: 1.1em; line-height: 1.6; }
+  .intro p { margin: 0 0 0.6em; }
+  .intro ul {
+    display: inline-block;
+    margin: 0;
+    padding-left: 1.25em;
+    text-align: left;
+  }
+  .intro li { margin: 0 0 0.3em; }
 
   /* Fixed-height slot so the layout doesn't shift when the button morphs */
   .slot {
@@ -137,28 +184,31 @@
   button {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     place-items: center;
     width: 100%;
     max-width: 320px;
-    height: 3.5rem;
+    height: 3.25rem;
     padding: 0;
     overflow: hidden;
-    font: inherit;
-    font-size: 1.125rem;
+    font-family: inherit;
+    font-size: 16px;
     font-weight: 600;
     color: #fff;
-    background: #1a1a1a;
+    background: var(--brand);
     border: 0;
-    border-radius: 10px;
+    border-radius: 15px;
     cursor: pointer;
     transition:
       max-width 0.5s cubic-bezier(0.34, 1.4, 0.64, 1),
       height 0.5s cubic-bezier(0.34, 1.4, 0.64, 1),
       border-radius 0.5s ease,
-      background-color 0.3s ease;
+      background-color 0.5s ease;
   }
 
-  button:focus-visible { outline: 3px solid #1a1a1a; outline-offset: 4px; }
+  button:not(.done):not(:disabled):hover { background: var(--brand-dark); }
+
+  button:focus-visible { outline: 3px solid var(--brand); outline-offset: 4px; }
   button.done:focus-visible { outline-color: #fff; }
   button:disabled { opacity: 0.6; cursor: wait; }
 
@@ -208,15 +258,16 @@
   #message {
     min-height: 1.5em;
     margin: 0;
-    font-size: clamp(2rem, 9vw, 3.5rem);
+    font-family: 'Teko', 'Open Sans', sans-serif;
+    font-size: clamp(2.75rem, 11vw, 4.5rem);
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.05;
     text-align: center;
     overflow-wrap: anywhere;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    body, #pop, #pop.on, button, button *, .label { transition: none !important; }
+    body, #pop, #pop.on, button, button *, .label, .site-header nav a { transition: none !important; }
     #message.pop-in { animation: none; }
     .dot, .slot::before, .slot::after { display: none; }
   }
@@ -224,14 +275,28 @@
 </head>
 <body>
   <div id="pop" aria-hidden="true"></div>
-  <header>
-    <img src="https://www.nitrokey.com/sites/all/themes/nitrokey/logo.svg" alt="Nitrokey">
+
+  <header class="site-header">
+    <a class="logo" href="https://www.nitrokey.com" target="_blank" rel="noopener" aria-label="Nitrokey website">
+      <img src="https://www.nitrokey.com/sites/all/themes/nitrokey/logo.svg" alt="Nitrokey">
+    </a>
+    <nav aria-label="Nitrokey resources">
+      <a href="https://docs.nitrokey.com/nitrokeys/nitrokey3/getting-started" target="_blank" rel="noopener">Getting started with your Nitrokey</a>
+      <a href="https://docs.nitrokey.com/software/nk-app2/" target="_blank" rel="noopener">Nitrokey App 2</a>
+    </nav>
   </header>
 
   <main>
+    <div class="intro">
+      <p>This page lets you verify the authenticity of your Nitrokey.</p>
+      <ul>
+        <li>Insert your Nitrokey.</li>
+        <li>Click the button to verify authenticity.</li>
+      </ul>
+    </div>
     <div class="slot">
       <button id="verifyBtn" type="button">
-        <span class="label">Verify Genuine</span>
+        <span class="label">Verify Authenticity</span>
         <svg class="icon i-ok" viewBox="0 0 64 64" aria-hidden="true">
           <path pathLength="1" d="M13 34 L27 48 L52 17"/>
         </svg>
@@ -250,13 +315,6 @@
   </main>
 
 <script>
-
-  // ---- Replace with your real implementation; must resolve to a string ----
-  class NotImplementedError extends Error {}
-
-  async function verify() {
-    throw new NotImplementedError("verify() not implemented");
-  }
 
   // ---- UI ----
   const btn = document.getElementById("verifyBtn");
