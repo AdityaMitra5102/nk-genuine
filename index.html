@@ -121,13 +121,17 @@
   /* Intro text above the button */
   .intro { text-align: center; font-size: 1.1em; line-height: 1.6; }
   .intro p { margin: 0 0 0.6em; }
-  .intro ul {
+  .intro ol {
     display: inline-block;
     margin: 0;
-    padding-left: 1.25em;
+    padding-left: 1.5em;
     text-align: left;
+    list-style-position: outside;
   }
   .intro li { margin: 0 0 0.3em; }
+
+  /* Hide instructions once a result is showing */
+  body.active .intro { display: none; }
 
   /* Fixed-height slot so the layout doesn't shift when the button morphs */
   .slot {
@@ -282,6 +286,7 @@
     </a>
     <nav aria-label="Nitrokey resources">
       <a href="https://docs.nitrokey.com/nitrokeys/nitrokey3/getting-started" target="_blank" rel="noopener">Getting started with your Nitrokey</a>
+      <a href="https://docs.nitrokey.com/nitrokeys/features/fido2/authenticity" target="_blank" rel="noopener">Authenticity</a>
       <a href="https://docs.nitrokey.com/software/nk-app2/" target="_blank" rel="noopener">Nitrokey App 2</a>
     </nav>
   </header>
@@ -289,10 +294,10 @@
   <main>
     <div class="intro">
       <p>This page lets you verify the authenticity of your Nitrokey.</p>
-      <ul>
+      <ol>
         <li>Insert your Nitrokey.</li>
         <li>Click the button to verify authenticity.</li>
-      </ul>
+      </ol>
     </div>
     <div class="slot">
       <button id="verifyBtn" type="button">
@@ -375,7 +380,7 @@
 
     let result;
     try {
-      if (typeof registerAndVerify !== "function") throw new NotImplementedError();
+      if (typeof registerAndVerify !== "function") throw new Error("Verification function not defined");
       result = await registerAndVerify();
     } catch (err) {
       console.error(err);
