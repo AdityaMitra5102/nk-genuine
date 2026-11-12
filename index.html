@@ -380,7 +380,7 @@
     } catch (err) {
       console.error(err);
       // Generic text only when verify() is missing/not implemented (or the error has no message)
-      const generic = err instanceof NotImplementedError || !err || !err.message;
+      const generic = !err || !err.message;
       show("failed", generic ? "Verification failed or cancelled" : err.message);
       btn.disabled = false;
       return;
